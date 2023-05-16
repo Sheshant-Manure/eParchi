@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= locals.page_title %></title>
+    <!-- Our Stylesheet! The assets folder is the root directory for all static files (See index.js line #34, #35) -->
+    <link rel="stylesheet" type="text/css" href="/css/home.css"> 
+    <!-- Fontawesome CDN to use icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.1/css/fontawesome.min.css" integrity="sha384-QYIZto+st3yW+o8+5OHfT6S482Zsvz2WfOzpFSXMF9zqeLcFV0/wlZpMtyFcZALm" crossorigin="anonymous">
+    <!-- Bootstrap 5 CSS and JS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+</head>
+<body>
+    <!-- Page Heading (Title and subtitle) inside a Bootstrap 5 Jumbotron -->
+    <div class="jumbotron jumbotron-fluid textCenter">
+      <div class="container">
+        <h1 class="display-4"><b>eParchi</b></h1>
+        <p class="lead">A Simple To-Do List Maker!</p>
+      </div>
+    </div>
+
+    <!-- Page Content (Body) -->
+    <div class="container">
+      <div class="row textCenter">
+        <!-- User inputs to create a new todo list -->
+        <div class="col-4" style="padding-left: 80px;">
+          <br><br><br>
+          <form action="/todo" method="post">
+            <div class="mb-3">
+              <label class="form-label">Create a new To-Do List </label><br>
+              <input style="margin-bottom: 7px;" type="text" name="todoListName" placeholder="Enter To-Do List Name"><br>
+              <div class="container">
+                <div class="row">
+                  <div class="col">
+                    
+                    <label class="form-label">Category</label><br>
+                    <!-- Todo List Categories -->
+                    <select style="padding: 10px;" name="category">
+                      <option value="Personal">Personal</option>
+                      <option value="Office">Office</option>
+                      <option value="Household">Household</option>
+                      <option value="Wishlist">Wishlist</option>
+                      <option value="Other">Other</option>
+                    </select>
+
+                  </div>
+                  
+                  <div class="col">
+                    <!-- Setting the due date -->
+                    <label class="form-label">Select Due Date</label><br>
+                    <input style="padding: 10px;" type="date" name="dueDate">
+                  </div>
+
+                </div>
+                
+              </div><br>
+              <div class="container">
+                <label class="form-label">Enter/Describe the task(s)</label>
+              </div>
+              <br>
+              <input style="margin-bottom: 7px;" type="text" name="task" placeholder="Task 1">
+              <!-- Adding tasks, Fontawesome + sign used here! -->
+              <button type="button" style="padding: 11px; margin-bottom: 5px; " id="addNewTask" class="btn btn-primary"><i class="fa-sharp fa-solid fa-plus" style="color: #ffff;"></i></button><br>
+              <!-- When user clicks + btn, then this empty div will be updated with input tag to add next new task (See home.js) -->
+              <div id="taskInput"></div>
+              <button type="submit" id="createTodoListBtn" class="btn btn-primary">Create</button>
+            </div>
+          </form>    
+        </div>
+        <!-- List of todo lists -->
+        <div class="col-6">
+
+          <table class="table table-dark table-hover textCenter">
+            <!-- <thread> tag will create the first row wherein we describe the column names -->
+            <thead>
+              <tr>
+                <th scope="col">Category</th>
+                <th scope="col">Todo List</th>
+                <th scope="col">Due Date</th>
+                <th scope="col"> </th>
+              </tr>
+            </thead>
+    
+            <!-- The table body <tbody> contains the tasks to be done -->
+            <tbody>
+              <!-- <tr> tag will create the row for each todo list -->
+              <!-- Printing Category. Each category has a unique background color specified by the td class -->
+              <% for (let list_item_index in locals.todo_list_data) { %>
+              <tr>
+                <% if (todo_list_data[list_item_index].category == 'Household') { %>
+                <td class="table-info"><%= todo_list_data[list_item_index].category  %>
+                <% } else if (todo_list_data[list_item_index].category == 'Personal') { %>
+                  <td class="table-primary"><%= todo_list_data[list_item_index].category  %></td>
+                <% } else if (todo_list_data[list_item_index].category == 'Office') { %>
+                  <td class="table-danger"><%= todo_list_data[list_item_index].category  %></td>
+                <% } else if (todo_list_data[list_item_index].category == 'Wishlist') { %>
+                  <td class="table-warning"><%= todo_list_data[list_item_index].category  %></td>
+                <% } else if (todo_list_data[list_item_index].category == 'Other') { %>
+                  <td class="table-success"><%= todo_list_data[list_item_index].category  %></td>
+                <% } %>
+
+                  <!-- Todo List Name (stored title local variable), Due Date and Delete button -->
+                <td><%= todo_list_data[list_item_index].title %></td>
+                <td><%= todo_list_data[list_item_index].dueDate %></td>
+                <td><a href="/deleteTodo/?id=<%= todo_list_data[list_item_index]._id %>"><button class="btn-dark"><img src="/images/bin.png" alt="delete" width="20px" style="margin-bottom: 4px;"></button></a></td>
+               
+               <!-- Printing the tasks -->
+                <% for(let task_index in todo_list_data[list_item_index].tasks) { %>
+                <tr class="table-light">
+                  <td colspan="3"><%= todo_list_data[list_item_index].tasks[task_index] %></td>
+                  <td><input type="checkbox"></td>
+                </tr>
+                <% } %>
+              </tr>
+              <br>
+              <% } %>
+             </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <footer class="container">
+      <br><br><br>
+    </footer>
+    
+    <!-- Our JS File! The assets folder is the root directory for all static files (See index.js line #34, #35) -->
+    <script src="/js/home.js"></script>
+</body>
+</html>
